@@ -1,0 +1,343 @@
+{
+  "name": "WF_Hackathon_EmailClassifier",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55b5a755-eeaf-4ce7-b600-e6c864dc7e10",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.body.md }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b4beb5d-81dc-4de6-a0f1-450e2bf78b3c",
+      "name": "Get Parsed Markdown",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        240,
+        0
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7a596271-1cf9-4105-bb27-9ceadf124c1d",
+      "name": "Webhook1",
+      "webhookId": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        660
+      ],
+      "id": "532cb890-a5fc-4931-b7d4-6515cfc133c3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('Webhook1').item.json.query.MessageID }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "fd21d0fc-e284-4ccc-8a96-56b1e6320cb9",
+      "name": "Get Message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        440,
+        0
+      ],
+      "webhookId": "13036143-6e5b-47c1-84a4-a92cbc33b37f",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI-powered email classification agent designed to categorize consumer banking lending service requests received after loan disbursal. Your goal is to classify emails based on their content, prioritizing the email body over attachments when determining intent. Additionally, if the attachment contains numerical details such as amount, account number, or other financial identifiers, extract and include them in the JSON output.\n\nEmail Content:\n{{ $json['Email Body'] }}\n\nAttachment Content:\n{{ $json['Attachment Content'] }}\n\nProcessing Steps:\n\n1. Extract the Latest Email from the Email Thread:\n   Identify and isolate only the most recent email from a multi-email thread. The Email Body is within the Email Content. Extract the latest email from the Email Body before classification. If the latest email body suggests that it is a follow-up email, please classify the Request Type as \"Duplicate\" and Sub Request as \"N/A\" in the output JSON.\n\n2. Filter Out Redundant Responses:\n   If the latest email is a generic response (e.g., \"Thank you,\" \"Noted,\" \"Please confirm,\" \"See below\") with no new service request details, classify it as:\n\n   {\n     \"request_type\": \"Duplicate\",\n     \"sub_request_type\": \"N/A\",\n     \"confidence_score\": 1.0,\n     \"reasoning\": \"The latest email contains only an acknowledgment or general response with no actionable request.\"\n   }\n\nIf the latest email is a blank forward with no additional context, classify it similarly as a duplicate.\n\nIf the latest email contains relevant service request details, proceed with classification.\n\n3. Identify and Classify Multiple Requests Within the Same Email: Emails may contain multiple service requests in the same message. Split and analyze each request separately based on structure, key terms, and context. Generate a separate JSON output for each detected request.\n\n   Example Classification Output for Multiple Requests:\n\n   Input Email:\n   \"Dear Team, we request a commitment increase for our loan facility. Additionally, please process a fee payment for the Letter of Credit Fee. Let us know if further details are required.\"\n\n   Output JSON:\n   [\n     {\n       \"request_type\": \"Commitment Change\",\n       \"sub_request_type\": \"Increase\",\n       \"confidence_score\": 0.95,\n       \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n     },\n     {\n       \"request_type\": \"Fee Payment\",\n       \"sub_request_type\": \"Letter of Credit Fee\",\n       \"confidence_score\": 0.92,\n       \"reasoning\": \"The email mentions 'fee payment' and 'Letter of Credit Fee,' indicating a request for processing a fee payment.\"\n     }\n   ]\n\n4. Extract and Include Numerical Details from Attachments: If the email contains an attachment, extract relevant numerical details such as amounts, account numbers, reference numbers, loan IDs, or payment details. Include this extracted information in the JSON output.\n\n   Example:\n   Input Email with Attachment:\n   \"Dear Team, please process the attached payment for loan settlement.\"\n\n   Attachment Content:\n   \"Loan ID: 123456789\n    Amount: $25,000\n    Account Number: 987654321\"\n\n   Output JSON:\n   {\n     \"request_type\": \"Loan Settlement\",\n     \"sub_request_type\": \"Payment Processing\",\n     \"confidence_score\": 0.93,\n     \"reasoning\": \"The email requests payment processing for loan settlement, and the attachment contains details confirming the transaction.\",\n     \"extracted_details\": {\n       \"loan_id\": \"123456789\",\n       \"amount\": \"$25,000\",\n       \"account_number\": \"987654321\"\n     }\n   }\n\n5. Classify the Email Based on Its Content:\n   Analyze key terms, phrasing, and structure to classify the request into one of the predefined categories:\n\n   - Adjustment\n   - AU Transfer\n   - Closing Notice (Reallocation Fees, Amendment Fees, Reallocation Principal)\n   - Commitment Change (Cashless Roll, Decrease, Increase)\n   - Fee Payment (Ongoing Fee, Letter of Credit Fee)\n   - Money Movement (Inbound/Outbound)\n\n   If no clear match is found, default to:\n\n   {\n     \"request_type\": \"Others\",\n     \"sub_request_type\": \"Others\",\n     \"confidence_score\": 0.6,\n     \"reasoning\": \"The email does not fit into any predefined request types but indicates a general inquiry.\"\n   }\n\n6. Confidence Score & Explanation:\n   Assign a confidence score (0-1) based on how strongly the email matches a category. Provide a brief reasoning in the output.\n\nExample Classification Output:\n\nCase 1: Duplicate Email (Generic Response)\nInput Email: \"Thank you!\"\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The latest email contains only an acknowledgment with no actionable request.\"\n}\n\nCase 2: Blank Forward\nInput Email: Forwarded email with no new content.\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The email is a blank forward with no additional context or request details.\"\n}\n\nCase 3: Classification of a Commitment Change\nInput Email: \"Dear Team, we request a commitment increase for our loan facility. Please confirm the process.\"\n\nOutput JSON:\n{\n  \"request_type\": \"Commitment Change\",\n  \"sub_request_type\": \"Increase\",\n  \"confidence_score\": 0.95,\n  \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1300,
+        260
+      ],
+      "id": "4b8f2f6e-1aff-4a06-a8cd-2987a9d548b5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        500
+      ],
+      "id": "177a77c5-f4a7-48c1-b7b5-c89243418409",
+      "name": "LLAMA",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0817f0-94b3-49d2-b0ad-3a11315a61dd",
+              "name": "Email Body",
+              "value": "={{ $('Get Message').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c3563b6e-d297-4843-8c2a-c7eda1dbff22",
+              "name": "Attachment Content",
+              "value": "={{ $('Get Parsed Markdown').item.json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1080,
+        0
+      ],
+      "id": "91b648a4-ccd0-4e9f-a70d-93749c9612ac",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following:\n\n\n {{ $('Get Parsed Markdown').item.json.data }}",
+              "prompt": "=Write a concise summary of the following:\n\n\n {{ $('Get Parsed Markdown').item.json.data }}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2,
+      "position": [
+        680,
+        0
+      ],
+      "id": "1f755377-ae00-43ee-b70e-398f5a9acdf7",
+      "name": "Summarization Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        600,
+        280
+      ],
+      "id": "1b39f46f-84fb-4c56-9a76-d376e3c936f2",
+      "name": "LLAMA1",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0817f0-94b3-49d2-b0ad-3a11315a61dd",
+              "name": "Email Body",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c3563b6e-d297-4843-8c2a-c7eda1dbff22",
+              "name": "Attachment Content",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        360,
+        660
+      ],
+      "id": "73707311-bbfd-4742-a4e3-f0b24b046fad",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "content": "## Executed from another workflow\n### If an email does not contain an attachment, the email data is passed from the parent workflow directly for classification",
+        "height": 300,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20,
+        540
+      ],
+      "id": "9b97609e-7c18-4435-ae44-7e038e1da9b0",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Get Parsed Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Parsed Markdown": {
+      "main": [
+        [
+          {
+            "node": "Get Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message": {
+      "main": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d410ca12-ab86-4b85-a7c0-2c2e9b4a9683",
+  "meta": {
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "WHMrwaYUjSfLqFAM",
+  "tags": []
+}

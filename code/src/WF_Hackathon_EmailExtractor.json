@@ -1,0 +1,341 @@
+{
+  "name": "WF_Hackathon_EmailExtractor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -780,
+        100
+      ],
+      "id": "4911abdb-a83c-4756-ae1c-605191b049e9",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "id": "c3e00eb0-8225-4850-a5bc-cf3a731e881c",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -580,
+        100
+      ],
+      "webhookId": "344de9dc-4062-4552-ae29-1e9150322cdb",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "id": "0eb11970-14f1-4d88-9caf-fb0320462d75",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        -400,
+        100
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "2845481d-212d-4eee-b992-07395a02da33",
+      "name": "Get Message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -220,
+        100
+      ],
+      "webhookId": "13036143-6e5b-47c1-84a4-a92cbc33b37f",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "460b82e5-30f5-4cb3-a937-a275fd256fcc",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $input.item.binary }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "76892d77-d25f-4906-832c-024063ed3541",
+      "name": "Is there an Email Attachement",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        20,
+        100
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## Get unread emails from GMAIL.",
+        "height": 380,
+        "width": 740,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -820,
+        -40
+      ],
+      "id": "05008e07-ad88-4d24-a034-6e1ab4a5b30a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Extract Attachment Data",
+        "height": 260,
+        "width": 460,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -120
+      ],
+      "id": "e4956b79-578b-41f7-9601-43483309502f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/parsing/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "authorization",
+              "value": "Bearer llx-12uM9VHAt7jP23wytNUZUtJ4HHoWuEX51kyCNSP3qgpwzweP"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "=file",
+              "inputDataFieldName": "attachment_0"
+            },
+            {
+              "name": "webhook_url",
+              "value": "=https://adityasinha.app.n8n.cloud/webhook/c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8?MessageID={{ $('Gmail').item.json.id }}"
+            },
+            {
+              "name": "accurate_mode",
+              "value": "true"
+            },
+            {
+              "name": "premium_mode",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "ee56e522-b764-4d02-bf4e-37f2a3dcd727",
+      "name": "Parse Document with LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        500,
+        -40
+      ],
+      "executeOnce": true,
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "6rjKsmhaJeofmDHR",
+          "name": "Header Auth account"
+        },
+        "httpBasicAuth": {
+          "id": "NysjyNPFoklsZzdj",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WHMrwaYUjSfLqFAM",
+          "mode": "list",
+          "cachedResultName": "WF_Hackathon_EmailClassifier"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        380
+      ],
+      "id": "3ab70e8e-52a8-431f-b8b4-408eb5b7ce4b",
+      "name": "Execute Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Get Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message": {
+      "main": [
+        [
+          {
+            "node": "Is there an Email Attachement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is there an Email Attachement": {
+      "main": [
+        [
+          {
+            "node": "Parse Document with LlamaParse",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "415ae64e-a12e-4913-9107-804da22f336c",
+  "meta": {
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "cvOzbaZYfXMxh2ej",
+  "tags": []
+}
