@@ -1,0 +1,913 @@
+{
+  "name": "Mail_AttachmentExtractor",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55b5a755-eeaf-4ce7-b600-e6c864dc7e10",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.body.md }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "093f2edb-6bd9-495e-8ccb-75e4acef8bdd",
+      "name": "Get Parsed Markdown",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1100,
+        -380
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1320,
+        -380
+      ],
+      "id": "4e0b2a74-148d-4436-94c9-48054e0cbfa1",
+      "name": "Webhook1",
+      "webhookId": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        140,
+        220
+      ],
+      "id": "6d9e6982-136c-4314-ad13-f8694569e248",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('Webhook1').item.json.query.MessageID }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "300bb772-7ef3-4851-a54c-d2847ed753ab",
+      "name": "Get Message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -880,
+        -380
+      ],
+      "webhookId": "13036143-6e5b-47c1-84a4-a92cbc33b37f",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI-powered email classification agent designed to categorize consumer banking lending service requests received after loan disbursal. Your goal is to classify emails based on their content, prioritizing the email body over attachments when determining intent. Additionally, if the attachment contains numerical details such as amount, account number, or other financial identifiers, extract and include them in the JSON output.\n\nEmail Content:\n{{ $json['Email Body'] }}\n\nAttachment Content:\n{{ $json['Attachment Content'] }}\n\nProcessing Steps:\n\n1. Extract the Latest Email from the Email Thread:\n   Identify and isolate only the most recent email from a multi-email thread. The Email Body is within the Email Content. Extract the latest email from the Email Body before classification. If the latest email body suggests that it is a follow-up email, please classify the Request Type as \"Duplicate\" and Sub Request as \"N/A\" in the output JSON.\n\n2. Filter Out Redundant Responses:\n   If the latest email is a generic response (e.g., \"Thank you,\" \"Noted,\" \"Please confirm,\" \"See below\") with no new service request details, classify it as:\n\n   {\n     \"request_type\": \"Duplicate\",\n     \"sub_request_type\": \"N/A\",\n     \"confidence_score\": 1.0,\n     \"reasoning\": \"The latest email contains only an acknowledgment or general response with no actionable request.\"\n   }\n\nIf the latest email is a blank forward with no additional context, classify it similarly as a duplicate.\n\nIf the latest email contains relevant service request details, proceed with classification.\n\n3. Identify and Classify Multiple Requests Within the Same Email: Emails may contain multiple service requests in the same message. Split and analyze each request separately based on structure, key terms, and context. Generate a separate JSON output for each detected request.\n\n   Example Classification Output for Multiple Requests:\n\n   Input Email:\n   \"Dear Team, we request a commitment increase for our loan facility. Additionally, please process a fee payment for the Letter of Credit Fee. Let us know if further details are required.\"\n\n   Output JSON:\n   [\n     {\n       \"request_type\": \"Commitment Change\",\n       \"sub_request_type\": \"Increase\",\n       \"confidence_score\": 0.95,\n       \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n     },\n     {\n       \"request_type\": \"Fee Payment\",\n       \"sub_request_type\": \"Letter of Credit Fee\",\n       \"confidence_score\": 0.92,\n       \"reasoning\": \"The email mentions 'fee payment' and 'Letter of Credit Fee,' indicating a request for processing a fee payment.\"\n     }\n   ]\n\n4. Extract and Include Numerical Details from Attachments: If the email contains an attachment, extract relevant numerical details such as amounts, account numbers, reference numbers, loan IDs, or payment details. Include this extracted information in the JSON output.\n\n   Example:\n   Input Email with Attachment:\n   \"Dear Team, please process the attached payment for loan settlement.\"\n\n   Attachment Content:\n   \"Loan ID: 123456789\n    Amount: $25,000\n    Account Number: 987654321\"\n\n   Output JSON:\n   {\n     \"request_type\": \"Loan Settlement\",\n     \"sub_request_type\": \"Payment Processing\",\n     \"confidence_score\": 0.93,\n     \"reasoning\": \"The email requests payment processing for loan settlement, and the attachment contains details confirming the transaction.\",\n     \"extracted_details\": {\n       \"loan_id\": \"123456789\",\n       \"amount\": \"$25,000\",\n       \"account_number\": \"987654321\"\n     }\n   }\n\n5. Classify the Email Based on Its Content:\n   Analyze key terms, phrasing, and structure to classify the request into one of the predefined categories:\n\n   - Adjustment\n   - AU Transfer\n   - Closing Notice (Reallocation Fees, Amendment Fees, Reallocation Principal)\n   - Commitment Change (Cashless Roll, Decrease, Increase)\n   - Fee Payment (Ongoing Fee, Letter of Credit Fee)\n   - Money Movement (Inbound/Outbound)\n\n   If no clear match is found, default to:\n\n   {\n     \"request_type\": \"Others\",\n     \"sub_request_type\": \"Others\",\n     \"confidence_score\": 0.6,\n     \"reasoning\": \"The email does not fit into any predefined request types but indicates a general inquiry.\"\n   }\n\n6. Confidence Score & Explanation:\n   Assign a confidence score (0-1) based on how strongly the email matches a category. Provide a brief reasoning in the output.\n\nExample Classification Output:\n\nCase 1: Duplicate Email (Generic Response)\nInput Email: \"Thank you!\"\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The latest email contains only an acknowledgment with no actionable request.\"\n}\n\nCase 2: Blank Forward\nInput Email: Forwarded email with no new content.\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The email is a blank forward with no additional context or request details.\"\n}\n\nCase 3: Classification of a Commitment Change\nInput Email: \"Dear Team, we request a commitment increase for our loan facility. Please confirm the process.\"\n\nOutput JSON:\n{\n  \"request_type\": \"Commitment Change\",\n  \"sub_request_type\": \"Increase\",\n  \"confidence_score\": 0.95,\n  \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1440,
+        220
+      ],
+      "id": "b3b72194-1471-4928-8339-c26786d6acec",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        420
+      ],
+      "id": "7c13c717-36b3-4fb2-b638-3632c3ef9722",
+      "name": "LLAMA",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0817f0-94b3-49d2-b0ad-3a11315a61dd",
+              "name": "Email Body",
+              "value": "={{ $('Get Message').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c3563b6e-d297-4843-8c2a-c7eda1dbff22",
+              "name": "Attachment Content",
+              "value": "={{ $('Get Parsed Markdown').item.json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        -160
+      ],
+      "id": "1cabbcc6-0802-4a9e-93fa-0473b751cfde",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following:\n\n\n {{ $('Get Parsed Markdown').item.json.data }}",
+              "prompt": "=Write a concise summary of the following:\n\n\n {{ $('Get Parsed Markdown').item.json.data }}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -160
+      ],
+      "id": "8665ec68-1dbb-4430-ac1e-0241d2e752ca",
+      "name": "Summarization Chain",
+      "notesInFlow": true,
+      "notes": "Summarize the attachment content to reduce the prompt token size"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0817f0-94b3-49d2-b0ad-3a11315a61dd",
+              "name": "Email Body",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c3563b6e-d297-4843-8c2a-c7eda1dbff22",
+              "name": "Attachment Content",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        220
+      ],
+      "id": "e480ff22-84fc-40b3-a312-1ac7949b424e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "content": "## Get Attachment Data from LLAMAPARSE\n### The messageID is provided in the webhook URL which is used to extract the exact message body",
+        "height": 340,
+        "width": 700,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        -500
+      ],
+      "id": "892708ee-a732-4fff-9c11-c8af2271fc18",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Executed from another workflow\n### If an email does not contain an attachment, the email data is passed from the parent workflow directly for classification",
+        "height": 300,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        60,
+        100
+      ],
+      "id": "f5c8e838-2f8b-4307-82ff-10fd2fe19fa9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AI Email Classifier\n### Using the email body, attachment content, the email is classified as per the system prompt.\nModel - Groq - llama-3.2-90b-vision-preview",
+        "height": 460,
+        "width": 820,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        80
+      ],
+      "id": "b19c2acf-fe4b-4277-a329-e48e082e6adf",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        780,
+        100
+      ],
+      "id": "d9af0720-0282-440a-b3c1-0c17c0253bc8",
+      "name": "LLAMA2",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $('Get Parsed Markdown').item.json.data }}",
+        "name": "={{ $now.format('yyyy-MM-dd mmss') }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1aDbDLeW36bH7Uav4_S-TORENTQ_ZfKq-",
+          "mode": "list",
+          "cachedResultName": "Email_Classification",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1aDbDLeW36bH7Uav4_S-TORENTQ_ZfKq-"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -580,
+        -380
+      ],
+      "id": "43b5b519-ad3e-4314-8c34-b13b0c11aa50",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "WojzCS2SWJ9wO54D",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -360,
+        -380
+      ],
+      "id": "ff48eaa9-ef24-42f7-bb65-25be98ee650b",
+      "name": "Wait",
+      "webhookId": "e904d8db-ce4f-4a03-8d29-1ab2e121d405"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "whatToSearch": "files",
+          "fileTypes": [
+            "*"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -140,
+        -380
+      ],
+      "id": "ff9de19a-40fd-47be-a59c-0ae387b1efb5",
+      "name": "Google Drive1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "WojzCS2SWJ9wO54D",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bb485f01-9b40-4d91-a59e-a2d832288013",
+              "leftValue": "={{ $json.driveFiles }}",
+              "rightValue": "={{ $('Get Message').item.binary.keys().length }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -380
+      ],
+      "id": "e2b24d62-5d79-41c2-9a74-610c53fbaa73",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0114d9e2-962f-4cfb-acf7-d9e04188d060",
+              "name": "driveFiles",
+              "value": "={{ $('Google Drive1').all().length}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -380
+      ],
+      "id": "cd48a9a0-8fbe-436b-b4e4-3be89ee9ccd4",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nNjU2iJdjKxvGZME",
+          "mode": "list",
+          "cachedResultName": "Mail_Classifier"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        -440
+      ],
+      "id": "fe0c7075-82f0-461b-9d2b-773fd3c23ef9",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55b5a755-eeaf-4ce7-b600-e6c864dc7e10",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.body.md }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5dcfdf74-736d-443e-8553-61c7ab4ff6f4",
+      "name": "Get Parsed Markdown1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1260,
+        900
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1480,
+        900
+      ],
+      "id": "0902a76a-0b4d-4cbb-b613-0435be78d02f",
+      "name": "Webhook",
+      "webhookId": "c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('Webhook').item.json.query.MessageID }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "2c29d369-21dc-401c-b4f6-ee6794a30d2a",
+      "name": "Get Message1",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -1040,
+        900
+      ],
+      "webhookId": "13036143-6e5b-47c1-84a4-a92cbc33b37f",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Get Attachment Data from LLAMAPARSE\n### The messageID is provided in the webhook URL which is used to extract the exact message body",
+        "height": 340,
+        "width": 700,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1540,
+        780
+      ],
+      "id": "abd8bff5-bca9-479c-be4e-288429f71334",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app8YpmUTZaSxr5wJ",
+          "mode": "list",
+          "cachedResultName": "Email_Data",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXsN7elHVWiAJWM",
+          "mode": "list",
+          "cachedResultName": "Attachments",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ/tblXsN7elHVWiAJWM"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "MessageID": "={{ $json.id }}",
+            "FileData": "={{ $('Webhook').item.json.body.txt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "S.No",
+              "displayName": "S.No",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "MessageID",
+              "displayName": "MessageID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "FileData",
+              "displayName": "FileData",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -660,
+        900
+      ],
+      "id": "b78679dc-c004-462d-a133-100adf002e8d",
+      "name": "Airtable - AddNewRecord",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "DkUk4mQrQ0O4Ochv",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app8YpmUTZaSxr5wJ",
+          "mode": "list",
+          "cachedResultName": "Email_Data",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXsN7elHVWiAJWM",
+          "mode": "list",
+          "cachedResultName": "Attachments",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ/tblXsN7elHVWiAJWM"
+        },
+        "filterByFormula": "={MessageID}='{{ $('Get Message1').item.json.id }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -380,
+        900
+      ],
+      "id": "4aa6a4a5-ac3c-4cf9-bb76-853f12d1ce68",
+      "name": "Airtable - FilterRecords",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "DkUk4mQrQ0O4Ochv",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bb485f01-9b40-4d91-a59e-a2d832288013",
+              "leftValue": "={{ $('Get Message1').item.binary.keys().length }}",
+              "rightValue": "={{ $('Airtable - FilterRecords').all().length }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        1120
+      ],
+      "id": "d843ae2a-3f1f-49e1-87eb-3540f990502a",
+      "name": "If - All Attachments Downloaded?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nNjU2iJdjKxvGZME",
+          "mode": "list",
+          "cachedResultName": "Mail_Classifier_WithAttachment"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        900
+      ],
+      "id": "e84b5a60-7d04-43bc-a56e-f2d02ff2032e",
+      "name": "Execute Workflow1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Get Parsed Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Parsed Markdown": {
+      "main": [
+        [
+          {
+            "node": "Get Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Parsed Markdown1": {
+      "main": [
+        [
+          {
+            "node": "Get Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Parsed Markdown1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message1": {
+      "main": [
+        [
+          {
+            "node": "Airtable - AddNewRecord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable - AddNewRecord": {
+      "main": [
+        [
+          {
+            "node": "Airtable - FilterRecords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable - FilterRecords": {
+      "main": [
+        [
+          {
+            "node": "If - All Attachments Downloaded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - All Attachments Downloaded?": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d1fc1603-162d-4e3e-8252-999418dd4c2e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "xqMwNo9oUNPJI7OJ",
+  "tags": []
+}

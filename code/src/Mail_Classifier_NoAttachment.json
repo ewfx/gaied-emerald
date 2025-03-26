@@ -1,0 +1,203 @@
+{
+  "name": "Mail_Classifier_NoAttachment",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -920,
+        140
+      ],
+      "id": "19e39d29-5186-470d-8abb-42de52a9a9d0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI-powered email classification agent designed to categorize consumer banking lending service requests received after loan disbursal. Your goal is to classify emails based on their content, prioritizing the email body over attachments when determining intent. Additionally, if the attachment contains numerical details such as amount, account number, or other financial identifiers, extract and include them in the JSON output.\n\nEmail Content:\n{{ $('Gmail').item.json.text }}\n\nAttachment Content:\n\n\nProcessing Steps:\n\n1. Extract the Latest Email from the Email Thread:\n   Identify and isolate only the most recent email from a multi-email thread. The Email Body is within the Email Content. Extract the latest email from the Email Body before classification. If the latest email body suggests that it is a follow-up email, please classify the Request Type as \"Duplicate\" and Sub Request as \"N/A\" in the output JSON.\n\n2. Filter Out Redundant Responses:\n   If the latest email is a generic response (e.g., \"Thank you,\" \"Noted,\" \"Please confirm,\" \"See below\") with no new service request details, classify it as:\n\n   {\n     \"request_type\": \"Duplicate\",\n     \"sub_request_type\": \"N/A\",\n     \"confidence_score\": 1.0,\n     \"reasoning\": \"The latest email contains only an acknowledgment or general response with no actionable request.\"\n   }\n\nIf the latest email is a blank forward with no additional context, classify it similarly as a duplicate.\n\nIf the latest email contains relevant service request details, proceed with classification.\n\n3. Identify and Classify Multiple Requests Within the Same Email: Emails may contain multiple service requests in the same message. Split and analyze each request separately based on structure, key terms, and context. Generate a separate JSON output for each detected request.\n\n   Example Classification Output for Multiple Requests:\n\n   Input Email:\n   \"Dear Team, we request a commitment increase for our loan facility. Additionally, please process a fee payment for the Letter of Credit Fee. Let us know if further details are required.\"\n\n   Output JSON:\n   [\n     {\n       \"request_type\": \"Commitment Change\",\n       \"sub_request_type\": \"Increase\",\n       \"confidence_score\": 0.95,\n       \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n     },\n     {\n       \"request_type\": \"Fee Payment\",\n       \"sub_request_type\": \"Letter of Credit Fee\",\n       \"confidence_score\": 0.92,\n       \"reasoning\": \"The email mentions 'fee payment' and 'Letter of Credit Fee,' indicating a request for processing a fee payment.\"\n     }\n   ]\n\n4. Extract and Include Numerical Details from Attachments: If the email contains an attachment, extract relevant numerical details such as amounts, account numbers, reference numbers, loan IDs, or payment details. Include this extracted information in the JSON output.\n\n   Example:\n   Input Email with Attachment:\n   \"Dear Team, please process the attached payment for loan settlement.\"\n\n   Attachment Content:\n   \"Loan ID: 123456789\n    Amount: $25,000\n    Account Number: 987654321\"\n\n   Output JSON:\n   {\n     \"request_type\": \"Loan Settlement\",\n     \"sub_request_type\": \"Payment Processing\",\n     \"confidence_score\": 0.93,\n     \"reasoning\": \"The email requests payment processing for loan settlement, and the attachment contains details confirming the transaction.\",\n     \"extracted_details\": {\n       \"loan_id\": \"123456789\",\n       \"amount\": \"$25,000\",\n       \"account_number\": \"987654321\"\n     }\n   }\n\n5. Classify the Email Based on Its Content:\n   Analyze key terms, phrasing, and structure to classify the request into one of the predefined categories:\n\n   - Adjustment\n   - AU Transfer\n   - Closing Notice (Reallocation Fees, Amendment Fees, Reallocation Principal)\n   - Commitment Change (Cashless Roll, Decrease, Increase)\n   - Fee Payment (Ongoing Fee, Letter of Credit Fee)\n   - Money Movement (Inbound/Outbound)\n\n   If no clear match is found, default to:\n\n   {\n     \"request_type\": \"Others\",\n     \"sub_request_type\": \"Others\",\n     \"confidence_score\": 0.6,\n     \"reasoning\": \"The email does not fit into any predefined request types but indicates a general inquiry.\"\n   }\n\n6. Confidence Score & Explanation:\n   Assign a confidence score (0-1) based on how strongly the email matches a category. Provide a brief reasoning in the output.\n\nExample Classification Output:\n\nCase 1: Duplicate Email (Generic Response)\nInput Email: \"Thank you!\"\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The latest email contains only an acknowledgment with no actionable request.\"\n}\n\nCase 2: Blank Forward\nInput Email: Forwarded email with no new content.\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The email is a blank forward with no additional context or request details.\"\n}\n\nCase 3: Classification of a Commitment Change\nInput Email: \"Dear Team, we request a commitment increase for our loan facility. Please confirm the process.\"\n\nOutput JSON:\n{\n  \"request_type\": \"Commitment Change\",\n  \"sub_request_type\": \"Increase\",\n  \"confidence_score\": 0.95,\n  \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        140,
+        140
+      ],
+      "id": "3a83db28-8ac0-4c08-af8f-cc542029dca6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        320
+      ],
+      "id": "bbdae71a-f443-4628-9a70-287757c5d5d6",
+      "name": "LLAMA",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI Email Classifier\n### Using the email body, attachment content, the email is classified as per the system prompt.\nModel - Groq - llama-3.2-90b-vision-preview",
+        "height": 460,
+        "width": 820,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        0
+      ],
+      "id": "e5e27b19-89e8-4dc9-b7a1-15a40dfa36ab",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -540,
+        140
+      ],
+      "id": "02b330f5-75ef-4221-adfa-821f5a240859",
+      "name": "Gmail",
+      "webhookId": "d13d7406-d314-4d82-888d-91ccf427d09c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "195d42135e005d81",
+          "threadId": "195d42135e005d81",
+          "labelIds": [
+            "UNREAD",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 5572,
+          "headers": {
+            "delivered-to": "Delivered-To: sinha031.aditya@gmail.com",
+            "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])\r\n        by mx.google.com with SMTPS id a640c23a62f3a-ac6f4bec4a7sor31204266b.2.2025.03.26.13.25.00\r\n        for <sinha031.aditya@gmail.com>\r\n        (Google Transport Security);\r\n        Wed, 26 Mar 2025 13:25:00 -0700 (PDT)",
+            "x-received": "X-Received: by 2002:a17:907:9447:b0:ac1:e2eb:8877 with SMTP id\r\n a640c23a62f3a-ac701c32dd7mr5071166b.11.1743020699445; Wed, 26 Mar 2025\r\n 13:24:59 -0700 (PDT)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1743020700; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=G5NvvQv4Eq26Dd8zUkdUH9tjH3hAeKGn2Nf9xyIUYmDe3Obv72l9FG47DW+wEZ86Ic\r\n         RVfJHJLvxq8dRWX0bapmpL0zf9TVEZJhYKTTvMGU8tcAIe6WHfbggj8LdKXS9sOKqWc8\r\n         RWqCd375ZYsb7PjrtEAkWcAmfjmjnx0GeDm34thi6KL7I4q+O2EP49inrclGSFveiPYi\r\n         uj+OjQCYJ6wzC5XvErEcwnPKgCb9bQMw5PGLeQNt6Yqbu0nq2GIqCT8n9e5o/7reALWX\r\n         CD4mcKW+mqG5UTEQ9BXV65wVUMkjYMfYj9gGyat/eUVsWAce1QYhEZzKmhmnGqzaLItK\r\n         Q1+w==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:mime-version:dkim-signature;\r\n        bh=RYxp7bXAu/k6bHl1F1+cN/KYBzTQfc6jADHkVyDdX1E=;\r\n        fh=vyYNUfc+RD2MOFKn10Q0ULZsjzRnAbg5wBT+fPAFkag=;\r\n        b=RiAWcIimolpU4WWqa9GqlkKIlHVyrTf/b784dl56Ejy3fiXAPSVlL78+x3Zz7Xzi5g\r\n         3MOhjFiUlISDKIUGVQB693Imu3+MfkiLim7XKCdjQ75TL2PLUx9VPB3EgF+azDpeXxLn\r\n         WMSEkzcj170ldh2lcqiZ8uPidEuvy4orK/95K8dOl8FHwStG5v06tKq93o00giHT5Ql1\r\n         WQ7bH2z3mBNqeNHTn7yKDKI82mVvjcwWmSlBn/v3lvXrHoUFNJ4ptMm0lS+WU8aZIFMH\r\n         agMl6f8SM5fvBLxEngFSG0iCRpxOoEk814f6bcfH/XNq6HhKo0JorNZXgyY+A4XSJWHE\r\n         tLPg==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=mA+CE++1;\r\n       spf=pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=aditya.sinha031@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "return-path": "Return-Path: <aditya.sinha031@gmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=mA+CE++1;\r\n       spf=pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=aditya.sinha031@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1743020700; x=1743625500; dara=google.com;\r\n        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject\r\n         :date:message-id:reply-to;\r\n        bh=RYxp7bXAu/k6bHl1F1+cN/KYBzTQfc6jADHkVyDdX1E=;\r\n        b=mA+CE++18tBeDdsQ62CLmb9CMfBnK8/l2BQZRttKdzoKxZ8gq6WmR8B/KSf66UfwDV\r\n         qbrzgNZt9CpnJ4VKf/HrjuZQntlm01OcerQnu7WlUb3kEyqDbC7Foy151ZNw1TCRALRV\r\n         nm2Q3C+9JThdSEHl94G/5e8iDaGKqfrtnch73D8Uo1EbAIMPXiHgksLOQtuHyU9bLDXp\r\n         sOhqJNaM5BtXNvpIU4OON+BXAoaqLh+BpZSYvMVy9brHJCBh0lDT3gspYMpOYUUmBlLy\r\n         TWSNrUolQKrZKp1koyqNSE6nH4j6QR+exend4RQwS/x7mE0utacNzLqluGVTdbHyPzll\r\n         S5aQ==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1743020700; x=1743625500;\r\n        h=to:subject:message-id:date:from:mime-version:x-gm-message-state\r\n         :from:to:cc:subject:date:message-id:reply-to;\r\n        bh=RYxp7bXAu/k6bHl1F1+cN/KYBzTQfc6jADHkVyDdX1E=;\r\n        b=tUkek/4LzpAnNVriy5eyGdtgi3ZzG+AK7eHCxvSTYPK0rnSZJ5+lm94d9dFxgrKpEw\r\n         p1ng2tHQtYxB3LxMVvZk0vN/OaUabFDJb6dB5+HyPHNfegtJVsTw4OZUZanvqNqufCCD\r\n         C2daAwON/1Rz/bfu+dlU/BXAUUmwl7Fw/Nha5HtIPiCHHqJvLumilH2mdtCKCLBMzPAI\r\n         khv9eLPXQwyXvCdXbfDIn1raU1HHINH24xHtisPMG+fvNQQmHG6/7Fa0oXmUWx1Rt42I\r\n         eELAFA+Dm3L2qkruReiJ0dUzNpOMP5CoMY3bAzs/Fpf9HyLHwsIPEWzynGdAD1/MnY2/\r\n         JA0Q==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0Yzu9HzD65F3xo1VuNxGGdNnTEZ+Zbhp5WOhhziFPnI2TdwxBUCM\r\n\tFpfR/2weiHgDjV8ZoPx+b33Tx94dyJQIIFEsIBXM5eYJcumtIMXjPF2z7E/eFA48ejSaJddY3Hg\r\n\tRr3iTiBfIgVMHn/tuwYifh/Btc0222Q==",
+            "x-gm-gg": "X-Gm-Gg: ASbGncvmxMTVHuyBvr0li1wHluCt+jgYOhQzEWiuDSM2csBGLqPIKa0UQ6K5CeppbXi\r\n\ttZJHtKQQrs6f+J+/J79hfevxAzJketLuqQKzyGTnWCI+2kXNBX5V+wmBbPTfLDO2aEx7n58vd9y\r\n\t3yomvjd2zcqkyUWc6tKbBCqfv7k7/nC9sbt9AlaFCtCWcFsLcmTZkyTds+zbdp",
+            "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IGvsYE0IgmLDnWfaumzr8fR+tvN2f6PRzrjy0GDAYA1GEJjn9ewq0m8K62TjVp507cDx+EdmIYMfa/6tNrCQI4=",
+            "mime-version": "MIME-Version: 1.0",
+            "from": "From: ADITYA SINHA <aditya.sinha031@gmail.com>",
+            "date": "Date: Thu, 27 Mar 2025 01:54:46 +0530",
+            "x-gm-features": "X-Gm-Features: AQ5f1Jo_U9t90iiytc_qwSHW1XzajwtQoT1MhkV7kHL3WoP2Y57H8twZEWIMhl8",
+            "message-id": "Message-ID: <CAHwYq89peL=A+huWQ7gV6aPsRC1=TeqF0=WakKOu22YoNQMHXw@mail.gmail.com>",
+            "subject": "Subject: Hey",
+            "to": "To: sinha031.aditya@gmail.com",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"000000000000a078cc063144a1ec\""
+          },
+          "html": "<div dir=\"ltr\">Wassup sir</div>\n",
+          "text": "Wassup sir\n",
+          "textAsHtml": "<p>Wassup sir</p>",
+          "subject": "Hey",
+          "date": "2025-03-26T20:24:46.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "sinha031.aditya@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:sinha031.aditya@gmail.com\" class=\"mp_address_email\">sinha031.aditya@gmail.com</a></span>",
+            "text": "sinha031.aditya@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "aditya.sinha031@gmail.com",
+                "name": "ADITYA SINHA"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">ADITYA SINHA</span> &lt;<a href=\"mailto:aditya.sinha031@gmail.com\" class=\"mp_address_email\">aditya.sinha031@gmail.com</a>&gt;</span>",
+            "text": "\"ADITYA SINHA\" <aditya.sinha031@gmail.com>"
+          },
+          "messageId": "<CAHwYq89peL=A+huWQ7gV6aPsRC1=TeqF0=WakKOu22YoNQMHXw@mail.gmail.com>"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "LLAMA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c47fde5-2c5e-495a-ad3e-ed9ea3ffe588",
+  "meta": {
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "P0WTYZxB1ZT79Qys",
+  "tags": []
+}

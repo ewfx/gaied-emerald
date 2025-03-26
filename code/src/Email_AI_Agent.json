@@ -1,0 +1,467 @@
+{
+  "name": "Email_AI_Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2280,
+        540
+      ],
+      "id": "b0d8c3e8-4015-4073-a0d5-935cffb6b231",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "id": "6eff2602-8b16-4245-a4f7-3e2de5664344",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -2060,
+        540
+      ],
+      "webhookId": "344de9dc-4062-4552-ae29-1e9150322cdb",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "id": "87af11aa-7bf9-4832-8958-8ff8b5c9ae57",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        -1840,
+        540
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "40d7f52e-e3fd-4508-b10e-1c4e99a3a71e",
+      "name": "Get Message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -1620,
+        540
+      ],
+      "webhookId": "13036143-6e5b-47c1-84a4-a92cbc33b37f",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Get unread emails from GMAIL.",
+        "height": 420,
+        "width": 980,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2360,
+        400
+      ],
+      "id": "d2e01856-661f-4284-b2cd-5e468222d7c1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "558b9447-7ced-4f0c-91f2-90badac661e2",
+              "name": "attachments",
+              "value": "={{ $('Get Message').item.binary.keys() }}",
+              "type": "array"
+            },
+            {
+              "id": "2ee142ba-2942-4ca3-9dce-3fed80ff0a7e",
+              "name": "messageID",
+              "value": "={{ $('Get Message').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        20
+      ],
+      "id": "ba9e1c2f-4fb9-4a89-8dfc-f4394250bb49",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "attachments",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        20
+      ],
+      "id": "efe33794-3c3c-4048-8401-fe75dd5f418f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "messageID",
+              "field2": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -180,
+        800
+      ],
+      "id": "9bdc8022-a381-475d-a73e-5ec9ab4e5e6b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/parsing/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "authorization",
+              "value": "Bearer llx-12uM9VHAt7jP23wytNUZUtJ4HHoWuEX51kyCNSP3qgpwzweP"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "=file",
+              "inputDataFieldName": "={{ $('Merge').item.json.attachments }}"
+            },
+            {
+              "name": "webhook_url",
+              "value": "=https://adityasinha.app.n8n.cloud/webhook/c09c909e-2e87-47f9-b39b-6a8d0ce3cbd8?MessageID={{ $('Gmail').item.json.id }}"
+            },
+            {
+              "name": "accurate_mode",
+              "value": "true"
+            },
+            {
+              "name": "premium_mode",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "438e7db9-3cf5-4134-b021-1438cab26d30",
+      "name": "Parse Document with LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        580,
+        920
+      ],
+      "executeOnce": true,
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "6rjKsmhaJeofmDHR",
+          "name": "Header Auth account"
+        },
+        "httpBasicAuth": {
+          "id": "NysjyNPFoklsZzdj",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        200,
+        800
+      ],
+      "id": "0c433611-e610-4cd0-9508-769eed909c59",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "14f2fac6-f7db-4b49-849c-b5ab6f35e499",
+              "leftValue": "={{ $('Get Message').item.binary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "57c65ec3-6066-4fa2-b95b-0729cab264ce",
+      "name": "Is there an Email Attachement",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1260,
+        280
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "P0WTYZxB1ZT79Qys",
+          "mode": "list",
+          "cachedResultName": "Mail_Classifier_NoAttachment"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        500
+      ],
+      "id": "9860a250-47a4-425a-872e-1b0c939f07b2",
+      "name": "Execute Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Get Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Is there an Email Attachement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Parse Document with LlamaParse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Document with LlamaParse": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is there an Email Attachement": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4219ee3b-1285-465b-bd99-2146c7667d8a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "WeAhRXI1wGQJTF4f",
+  "tags": []
+}

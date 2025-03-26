@@ -1,0 +1,394 @@
+{
+  "name": "Mail_Classifier_WithAttachment",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        500
+      ],
+      "id": "aa1b3695-4230-4796-bfb4-8426317440be",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI-powered email classification agent designed to categorize consumer banking lending service requests received after loan disbursal. Your goal is to classify emails based on their content, prioritizing the email body over attachments when determining intent. Additionally, if the attachment contains numerical details such as amount, account number, or other financial identifiers, extract and include them in the JSON output.\n\nEmail Content:\n{{ $('Gmail').item.json.text }}\n\nAttachment Content:\n{{ $('Aggregate').item.json.AggregatedData }}\n\nProcessing Steps:\n\n1. Extract the Latest Email from the Email Thread:\n   Identify and isolate only the most recent email from a multi-email thread. The Email Body is within the Email Content. Extract the latest email from the Email Body before classification. If the latest email body suggests that it is a follow-up email, please classify the Request Type as \"Duplicate\" and Sub Request as \"N/A\" in the output JSON.\n\n2. Filter Out Redundant Responses:\n   If the latest email is a generic response (e.g., \"Thank you,\" \"Noted,\" \"Please confirm,\" \"See below\") with no new service request details, classify it as:\n\n   {\n     \"request_type\": \"Duplicate\",\n     \"sub_request_type\": \"N/A\",\n     \"confidence_score\": 1.0,\n     \"reasoning\": \"The latest email contains only an acknowledgment or general response with no actionable request.\"\n   }\n\nIf the latest email is a blank forward with no additional context, classify it similarly as a duplicate.\n\nIf the latest email contains relevant service request details, proceed with classification.\n\n3. Identify and Classify Multiple Requests Within the Same Email: Emails may contain multiple service requests in the same message. Split and analyze each request separately based on structure, key terms, and context. Generate a separate JSON output for each detected request.\n\n   Example Classification Output for Multiple Requests:\n\n   Input Email:\n   \"Dear Team, we request a commitment increase for our loan facility. Additionally, please process a fee payment for the Letter of Credit Fee. Let us know if further details are required.\"\n\n   Output JSON:\n   [\n     {\n       \"request_type\": \"Commitment Change\",\n       \"sub_request_type\": \"Increase\",\n       \"confidence_score\": 0.95,\n       \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n     },\n     {\n       \"request_type\": \"Fee Payment\",\n       \"sub_request_type\": \"Letter of Credit Fee\",\n       \"confidence_score\": 0.92,\n       \"reasoning\": \"The email mentions 'fee payment' and 'Letter of Credit Fee,' indicating a request for processing a fee payment.\"\n     }\n   ]\n\n4. Extract and Include Numerical Details from Attachments: If the email contains an attachment, extract relevant numerical details such as amounts, account numbers, reference numbers, loan IDs, or payment details. Include this extracted information in the JSON output.\n\n   Example:\n   Input Email with Attachment:\n   \"Dear Team, please process the attached payment for loan settlement.\"\n\n   Attachment Content:\n   \"Loan ID: 123456789\n    Amount: $25,000\n    Account Number: 987654321\"\n\n   Output JSON:\n   {\n     \"request_type\": \"Loan Settlement\",\n     \"sub_request_type\": \"Payment Processing\",\n     \"confidence_score\": 0.93,\n     \"reasoning\": \"The email requests payment processing for loan settlement, and the attachment contains details confirming the transaction.\",\n     \"extracted_details\": {\n       \"loan_id\": \"123456789\",\n       \"amount\": \"$25,000\",\n       \"account_number\": \"987654321\"\n     }\n   }\n\n5. Classify the Email Based on Its Content:\n   Analyze key terms, phrasing, and structure to classify the request into one of the predefined categories:\n\n   - Adjustment\n   - AU Transfer\n   - Closing Notice (Reallocation Fees, Amendment Fees, Reallocation Principal)\n   - Commitment Change (Cashless Roll, Decrease, Increase)\n   - Fee Payment (Ongoing Fee, Letter of Credit Fee)\n   - Money Movement (Inbound/Outbound)\n\n   If no clear match is found, default to:\n\n   {\n     \"request_type\": \"Others\",\n     \"sub_request_type\": \"Others\",\n     \"confidence_score\": 0.6,\n     \"reasoning\": \"The email does not fit into any predefined request types but indicates a general inquiry.\"\n   }\n\n6. Confidence Score & Explanation:\n   Assign a confidence score (0-1) based on how strongly the email matches a category. Provide a brief reasoning in the output.\n\nExample Classification Output:\n\nCase 1: Duplicate Email (Generic Response)\nInput Email: \"Thank you!\"\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The latest email contains only an acknowledgment with no actionable request.\"\n}\n\nCase 2: Blank Forward\nInput Email: Forwarded email with no new content.\n\nOutput JSON:\n{\n  \"request_type\": \"Duplicate\",\n  \"sub_request_type\": \"N/A\",\n  \"confidence_score\": 1.0,\n  \"reasoning\": \"The email is a blank forward with no additional context or request details.\"\n}\n\nCase 3: Classification of a Commitment Change\nInput Email: \"Dear Team, we request a commitment increase for our loan facility. Please confirm the process.\"\n\nOutput JSON:\n{\n  \"request_type\": \"Commitment Change\",\n  \"sub_request_type\": \"Increase\",\n  \"confidence_score\": 0.95,\n  \"reasoning\": \"The email explicitly mentions 'commitment increase' and 'loan facility,' indicating a request for an increase in commitment.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -80,
+        500
+      ],
+      "id": "4c27db2a-ad84-4293-a201-3922f8240740",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        680
+      ],
+      "id": "14c82d81-498b-4f9a-9e8d-f5fff9063edc",
+      "name": "LLAMA",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Executed from another workflow\n### If an email does not contain an attachment, the email data is passed from the parent workflow directly for classification",
+        "height": 300,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        380
+      ],
+      "id": "70f98d8f-5fcb-42d0-ab62-b577bc45b14e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AI Email Classifier\n### Using the email body, attachment content, the email is classified as per the system prompt.\nModel - Groq - llama-3.2-90b-vision-preview",
+        "height": 460,
+        "width": 820,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        360
+      ],
+      "id": "3a2b435b-5a73-4f28-9213-80f70a6b64f2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.2-90b-vision-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        760
+      ],
+      "id": "40c06037-47b5-4411-b1c0-6c2bfdbfdff5",
+      "name": "LLAMA2",
+      "credentials": {
+        "groqApi": {
+          "id": "i53jFNJTN8RpAxqG",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "FileData",
+              "renameField": true,
+              "outputFieldName": "AggregatedData"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        500
+      ],
+      "id": "97ae0769-be22-40c0-a027-0af3b489f8d1",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $('When Executed by Another Workflow').first().json.MessageID }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -600,
+        500
+      ],
+      "id": "eaa0d55c-5086-47cf-b8ba-1420c73679bc",
+      "name": "Gmail",
+      "webhookId": "d13d7406-d314-4d82-888d-91ccf427d09c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5DTkvrKVWJkTkfgy",
+          "name": "Gmail_sinhaAditya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following:\n\n{{ $json.AggregatedData }}\n",
+              "prompt": "=Write a concise summary of the following:\n\n{{ $json.AggregatedData }}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2,
+      "position": [
+        -1080,
+        500
+      ],
+      "id": "8f9dcb82-40ee-43aa-9cbe-c6a0c20f6a04",
+      "name": "Summarization Chain",
+      "notesInFlow": true,
+      "notes": "Summarize the attachment content to reduce the prompt token size"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app8YpmUTZaSxr5wJ",
+          "mode": "list",
+          "cachedResultName": "Email_Data",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXsN7elHVWiAJWM",
+          "mode": "list",
+          "cachedResultName": "Attachments",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ/tblXsN7elHVWiAJWM"
+        },
+        "filterByFormula": "={MessageID}='{{ $('Gmail').item.json.id }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        500
+      ],
+      "id": "cda6c0af-b8fd-443e-b3b0-353227d82e89",
+      "name": "Airtable - FilterRecords",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "DkUk4mQrQ0O4Ochv",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        860,
+        500
+      ],
+      "id": "f696f251-e0fb-4011-ba2a-9a93887b8255",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "app8YpmUTZaSxr5wJ",
+          "mode": "list",
+          "cachedResultName": "Email_Data",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXsN7elHVWiAJWM",
+          "mode": "list",
+          "cachedResultName": "Attachments",
+          "cachedResultUrl": "https://airtable.com/app8YpmUTZaSxr5wJ/tblXsN7elHVWiAJWM"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        680
+      ],
+      "id": "adfdc123-ca04-46d5-9e26-80c76813fab3",
+      "name": "Airtable",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "DkUk4mQrQ0O4Ochv",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "recxnWSfRjOZZhmK7",
+          "createdTime": "2025-03-26T20:47:58.000Z",
+          "MessageID": "195d41a1380dd42b",
+          "FileData": "BANK OF AMERICA ~~\nBank of America, N.A\nTo: WELLS FARGO BANK NATIONAL ASSOCIATION\nDate 8-Nov-2023\nATTN AGENT DEFAULT\nPhone 999.999.9999\nFax 877-606-9426\nEmail DENLCFX@welisfargo.com\nRe CANTOR FITZGERALD LP USD 425MM MAR22 / REVOLVER / CANTOR FITO0037\nDeal CUSIP : 13861EAEO\nDeal ISIN US13861EAE05\nFacility CUSIP : 13861EAF7\nFacility ISIN: US13861EAF79\nLender MEI: US1L058422\nEffective 10-Nov-2023, CANTOR FITZGERALD LP has elected to repay under the SOFR (US) Term option\n20,000,000.00\n---\nPrevious Global principal balance : USD 45,000,000.00\nNew Global principal balance : USD 25,000,000.00\nThis loan was effective 20-Jul-2023 and is scheduled to reprice on 20-Nov-2023\nYour share of the USD 20,000,000.00 SOFR (US) Term option payment is USD 1,411,764.71\nPrevious Lender Share Principal Balance : USD 3,176,470.59\nNew Lender Share Principal Balance : USD 1,764,705.88\nWe will remit USD 1,411.764.71 on the effective date. Please note that (i) if the Borrower has not in fact ma\npayment; or (ii) any payment you receive is in excess of what was paid by the Borrower or (il) we notify you\nwas erroneously made, then pursuant to the provisions of the credit facility, you agree to return such payme\nFor: WELLS FARGO BANK NATIONAL ASSOCIATION\nTo : WELLS FARGO BANK, NA\nABA Number: 121000248\nAccount No : XXXXXXXXXX0720\nReference : CANTOR FITZGERALD LP USD 425MM MAR22 , SOFR (US) Term Principal Payment (CANT",
+          "S.No": 48
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLAMA2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Airtable - FilterRecords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable - FilterRecords": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c0efa7b0-de6c-45a7-a2b4-097cc5bf8c23",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "888486728674373f55c82b649a686e102ddf0c7b4fd160af805286e441af1894"
+  },
+  "id": "nNjU2iJdjKxvGZME",
+  "tags": []
+}
