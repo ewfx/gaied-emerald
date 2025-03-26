@@ -21,7 +21,8 @@ Our project aims to streamline the processing of commercial banking lending serv
 
 ## 🎥 Demo
 🔗 5 Videos uploaded
-📹 PPT describing the solution and scenarios uploaded
+📹 PPT describing the solution and scenarios uploaded. Architecture diagram ppt also uploaded.
+
 
 
 ## 💡 Inspiration
