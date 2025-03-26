@@ -1,0 +1,121 @@
+Delivered-To: sinha031.aditya@gmail.com
+Received: by 2002:a17:906:cb88:b0:ac6:9a96:a171 with SMTP id mf8csp2267763ejb;
+        Wed, 26 Mar 2025 14:01:58 -0700 (PDT)
+X-Received: by 2002:a05:620a:4112:b0:7c5:405e:e88f with SMTP id af79cd13be357-7c5ed9f8ad2mr196105985a.21.1743022918424;
+        Wed, 26 Mar 2025 14:01:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1743022918; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lrcQJX5dQq69xAhAT07BU5DOmfHWL7N7YIYiS2YWLyNGNCOugvchyHCE6q7OGXA2p7
+         AJfx9hzfcSeRktgZa/C0pPjBS5+xolbUV99bXr65My0ZCVD/dSovwpsPRX9mFsPxH0MF
+         wkJJFWc8qILPzSY+zef2a2OaOaH937N0WJuTJp5/Kc1ozXAZQN8b3fGsM4u6/SwFr5PU
+         hGU/jQ56f1i5J+htfBgvn5STHb1vpTxT0yXbjv1/75RxozTBJ7a9fD+ZeJV6T0znKAOC
+         XPO69yme7OCFswWnnPwLV6uB/XagYlOOkWMdn6oX4K2IJEdGMVd+7mzcVYhzBnvXslhZ
+         y/dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :dkim-signature;
+        bh=MPCIRF54JdJ6P8Ti/s3PFCO5J+8zVQyllBWKaku/IJI=;
+        fh=vyYNUfc+RD2MOFKn10Q0ULZsjzRnAbg5wBT+fPAFkag=;
+        b=Q0Rh5HelbP8s40SD4iF9zVzQ2rxepA9IloW0pcPBoKYAxiCW2z7T8jQB3sSxiKTmTO
+         hDfYqITnqUEA4ZrDXavKCYA81Z+xOXUj7sCjPS39Af94MATZl1y24vEHqP0umOnJMnC+
+         +JcU7ROJKuXWSyZS+2nc0L3+Wld7h2xBuqw6w9mApnDz4G7C4pmkn8CYsczqC70wCr0o
+         0I+Bd1UmMIRBl4jPDqWcDmx4YLvvORqEvrvY3jTSBe0O/aaYNSC+bj9dDQ+1d6fMWIv7
+         QKK/3C9GYc21gqS94RJ7kMrPcK1/U7sX+sGOlrMe+mUNexPiQoYFhrmwOHAAQ94ygiuP
+         4NDg==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b="EX/c/fRH";
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+Return-Path: <subramanianpriyanka89@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id af79cd13be357-7c5b9309c4esor1541501185a.3.2025.03.26.14.01.58
+        for <sinha031.aditya@gmail.com>
+        (Google Transport Security);
+        Wed, 26 Mar 2025 14:01:58 -0700 (PDT)
+Received-SPF: pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b="EX/c/fRH";
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743022918; x=1743627718; dara=google.com;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MPCIRF54JdJ6P8Ti/s3PFCO5J+8zVQyllBWKaku/IJI=;
+        b=EX/c/fRH0/BfeDJv/LnuPjHnSP5RSqhTCqTWe/VfMU/AaTm4X0yxZlsw/u4/N7/rNZ
+         +YmXJIlMjQ2BBVqXLGLplN1+CZgU8Ug8YAJ465O4dSLeksnmGhEVTA45UMXji0VHd8sO
+         wA4ALufsT2QrheIZSMt4IZxmLK9W5icGaxsi+MYpj7Q5b36oV4WdOa27X1xyKxzY+ByC
+         mwsFGRGe8h/YOE3mJ1DpXAf2BMwbgsl7xr4+OfHf0YwMProNfPU9TkEg6AT5LKRsDhNu
+         LT3IXgx5P231M0dsamN0D69SUuVEM4NC6pLWI4IUjlcP68nBLfVzt8t2MeJUvUYQIpCH
+         BlJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743022918; x=1743627718;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MPCIRF54JdJ6P8Ti/s3PFCO5J+8zVQyllBWKaku/IJI=;
+        b=lIINvNp4bdTtjVxRQOvE0ON/KC8zkARVrd/fuSRmrFU3bTjja2pDyMp23egS3aljtc
+         dIsGvzg+HisA71KRp4XxZJJ4KfDO0Bbn6jPxTLgVCX0tpSd1DE5bOn+4x63J1X0FPLaV
+         4GQs3MeVCIFbap+CnNRMmub8QNkWmct5BmM2m1t8ujUHZqTybkGMWpQZIl3ztw9k/sP9
+         fVDUUSUkOnO8vij8vnqX2SazPO/f+fHvUBl89wgP36i1medaRTBYWUPywh7N5BP7E3mZ
+         ZgJiw0DtyaatZl4euC/chS8FR9WmAiORkTMTwfuzJ71zxH1AJAQ2bkihj4GtJWpNCuA+
+         VPKw==
+X-Gm-Message-State: AOJu0YyFKHxVcPAigWqik2hATohfme31B0K/DlzjFq5oDaXbYCQJC2az
+	RAw+z3ywxNxD4de4T7XOFIckqZRE0mD5yH9SgCwJhNqO0BxO8sruRBnzkM05EOoyd5ACyweTqmF
+	nKcPnzHZToJlfWTOgZRU6OdLaSexiZ1BThBk=
+X-Gm-Gg: ASbGncvWZaZY5lFi5Z5wkGTrhhv8qAS6KUcEhJm7bxRM/BxRo6773tpvTaK65XX1ebk
+	Pwi5dl/sgGRFJ0U0dpHOVo4cNZzl+GGsp+1/o8S4JFWo3ixxkN9ewr/quG0pXoJGDbOElYPT16+
+	pOhuSXn/jAaGUvKcVnPyQPK9nNeK8=
+X-Google-Smtp-Source: AGHT+IH7UZfeqNoit70hF7v4cRiLuzrAltkbNagCfBoJ+AiHLa0MZ/VPadpMh1yfMAvh4TSWvFQQUaQmjyPWl13q5FY=
+X-Received: by 2002:a05:6214:d6c:b0:6e4:3eb1:2bdb with SMTP id
+ 6a1803df08f44-6ed23934af7mr11289636d6.43.1743022917578; Wed, 26 Mar 2025
+ 14:01:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <CADBqanfxa-vzx5i8j0dsWG4J2s3N6jtTT4virY7hvHtV1-KF1w@mail.gmail.com>
+In-Reply-To: <CADBqanfxa-vzx5i8j0dsWG4J2s3N6jtTT4virY7hvHtV1-KF1w@mail.gmail.com>
+From: Priyanka Subramanian <subramanianpriyanka89@gmail.com>
+Date: Thu, 27 Mar 2025 02:31:46 +0530
+X-Gm-Features: AQ5f1JrTGcZcyxrDjc58BQV07yydLSOntVArX9UjG5HIqpAYCQFYvLYMQeYQ64Y
+Message-ID: <CADBqandt9WxZ9B0XxFvkGaRBeNdBEdQyCf1OSZM=Luu60k0Btg@mail.gmail.com>
+Subject: Re: Request
+To: sinha031.aditya@gmail.com
+Content-Type: multipart/alternative; boundary="000000000000d676f406314525e1"
+
+--000000000000d676f406314525e1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Any updates on this please?
+
+On Thu, Mar 27, 2025 at 2:28=E2=80=AFAM Priyanka Subramanian <
+subramanianpriyanka89@gmail.com> wrote:
+
+> Hi,
+>
+> Is it possible to increase the sanctioned loan amount and also do away
+> with the fees for documentation?
+>
+> Thanks!
+>
+
+--000000000000d676f406314525e1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Any updates on this please?</div><br><div class=3D"gmail_q=
+uote gmail_quote_container"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, M=
+ar 27, 2025 at 2:28=E2=80=AFAM Priyanka Subramanian &lt;<a href=3D"mailto:s=
+ubramanianpriyanka89@gmail.com">subramanianpriyanka89@gmail.com</a>&gt; wro=
+te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
+0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"=
+ltr"><span style=3D"color:rgb(85,85,85)">Hi,=C2=A0</span><div><span style=
+=3D"color:rgb(85,85,85)"><br></span></div><div><span style=3D"color:rgb(85,=
+85,85)">Is it possible to increase the sanctioned loan amount and also do a=
+way with the fees for documentation?</span></div><div><span style=3D"color:=
+rgb(85,85,85)"><br></span></div><div><span style=3D"color:rgb(85,85,85)">Th=
+anks!</span></div></div>
+</blockquote></div>
+
+--000000000000d676f406314525e1--

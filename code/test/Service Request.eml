@@ -1,0 +1,144 @@
+Delivered-To: sinha031.aditya@gmail.com
+Received: by 2002:a17:906:cb88:b0:ac6:9a96:a171 with SMTP id mf8csp2264385ejb;
+        Wed, 26 Mar 2025 13:53:35 -0700 (PDT)
+X-Received: by 2002:a05:620a:2587:b0:7c5:4949:23ea with SMTP id af79cd13be357-7c5eda7ffb9mr217965985a.47.1743022415126;
+        Wed, 26 Mar 2025 13:53:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1743022415; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K3RxFlnHcVHu1iTcy12d6pGwCzykYXValzruW9ea0qv5znhnLTeHTvu/ketQg23MhO
+         5LIUZ+pJLM4XKi38kYaXx0HDM+UkVyIEccLw2VeqX6kNeRMlDO+OSzisV4j1+6MEaPUn
+         /bXficd6MSPj2KOdJw8XfhH1m3ZNydqG8VY+XRJhZeWqZxj+tj8qPHG6HXRidizXs61v
+         s4KjtVg/RjF+LLRJn8NCkLxOENVGo5x2JXGWr2e35CtBxYiTMzSa+AtSAaF9/fZrlys/
+         QdrJKXm7LutF9NjzLCSk1uqFa19YfRByypxBYFkUzOytisXXrhVIpwxTgytjTIP4uaOB
+         1h0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=4KJ0BVAeON4np/dkmoY+pROtWTB+dlBdi1Y/vGbvPgU=;
+        fh=vyYNUfc+RD2MOFKn10Q0ULZsjzRnAbg5wBT+fPAFkag=;
+        b=IVJhTWoFCVe1PVIoQpeRFFS1jSwueCx9TrsntS5j7fhLLK/DfacspsGs4pmpRU+D6w
+         ZxEO8An4/Jw6DDkf6C1hqsN/7a4aFLNJ76s8v+NVkTrFItcLeyJcRO1dOOgcObbSCH2D
+         GLU7dpYOROJ52vIJ5tUHg+q4ouD51HZYDixOJ3xZ73yj9WAPeu1bQkhWpiRsMgA8l9kE
+         pOWFXayQbzH0a0HZNtLu9lK1fGGn2URfrykbz5Xm2SAnln1VkFoML/1hlmPv+qZ86WkU
+         p04ksLN+5tSDSjQwoaKQFN5Ch53p4A5QqTCXXwSX+LxMSz8BfRqGrbyI42Q7peiW3mBm
+         3O6g==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=BXIQV0du;
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+Return-Path: <subramanianpriyanka89@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id af79cd13be357-7c5b93100basor1085579385a.4.2025.03.26.13.53.34
+        for <sinha031.aditya@gmail.com>
+        (Google Transport Security);
+        Wed, 26 Mar 2025 13:53:35 -0700 (PDT)
+Received-SPF: pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=BXIQV0du;
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743022414; x=1743627214; dara=google.com;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4KJ0BVAeON4np/dkmoY+pROtWTB+dlBdi1Y/vGbvPgU=;
+        b=BXIQV0du7UV6hWsyi+YmPsVQ2XjChCwoSQlTj/PjFlGxLyUBcF398gXtvfvPJ8FBuh
+         wADQyMGh/oTXmzFjDC7P+V1reA4SMkHznxWfGMRXGBD/Hjcvp8wA3Df7v0vUBuFOrwiz
+         0GWJK9WBIw0tX3Iq5PKbZInwiExlAlqxLPAAX8qygkR9/8XCJHxHuTKZZqFTB7vp0rIJ
+         YMJqu/FEIbozJfDvuX6JmA8q1+aTf/4KQOzmkTJmaChOrR18p0WwRwEouou+AX6cPcoX
+         Q8WvAk7FqJbcAXun9Bx17dKmv5Jpj6cQjg6yYDKvxqsfyWazDjM1IhanF2Pq/8//1D5L
+         d4Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743022414; x=1743627214;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4KJ0BVAeON4np/dkmoY+pROtWTB+dlBdi1Y/vGbvPgU=;
+        b=Ryit2At352HgMHSpEkyQsHYJ2mHIupEmVc6niHSc127GIE6zBXS8kUIl19/HnYZ1VB
+         2cYHaS1wKpPVksaCSoOWULnHjp1zX/IY2askRnayIGmVzDGcUlhJBfEYliOapkLnHBMn
+         hW1d98IQr24o4RO3GiIGSjDgWHLHe7myZsNSARGPHzYgfe/+4Zblm/sqTo42juWDfAn7
+         TJX3NJ5G56L2NN2QCjuRE3xmnF3ajfaJ1TK4BSQ25eHphALgz6LfuAJzyOoB34PwAxxj
+         Nx7sXmnPu5S8HWtSwYiZFktsN3Uf7IN009RAErOPKz2PpXTSQNzICBAogWW+9D1WBbKs
+         84hg==
+X-Gm-Message-State: AOJu0YxY1r0Os+mClf5qO+bcDWY33tK0phn6Pug8TaLUezGKxmhHNcKU
+	hy/FTpD/q8926sR6ByzWnH6qepkrIxdz/IK83zTlERrCjxohh0FrDTJKHTvCYzs0OiOqdjuxjTF
+	pfImhNn31dPlRaI2ICXuKbzCBZ1ObSHxyHYk=
+X-Gm-Gg: ASbGnctU/NnRG4pJiXLRXKEwfemrJw5KVu1HD+qv37GR0p+2f18U8CUNr5yZvqJbihy
+	xS+duSGvn5+2FnCk478vbk0fHInn7Z1bYJCIO/EcuoX2W9ClNdmuacxjYZWneo2VdW/374UJ3YC
+	s7IEjyl0Cg3fwsLMLdhVzfHy+XFfI=
+X-Google-Smtp-Source: AGHT+IHWta2BPwaxht0+leThHXMKr5Esr98gicYTZFDMh3+zzyrTk3A5wyx9T7WtJar+rINOb2w+PSgNxXPxAcPt9h8=
+X-Received: by 2002:a05:620a:44d5:b0:7c5:a5cc:bcb9 with SMTP id
+ af79cd13be357-7c5eda81bfbmr232079585a.56.1743022414021; Wed, 26 Mar 2025
+ 13:53:34 -0700 (PDT)
+MIME-Version: 1.0
+From: Priyanka Subramanian <subramanianpriyanka89@gmail.com>
+Date: Thu, 27 Mar 2025 02:23:21 +0530
+X-Gm-Features: AQ5f1JrA1PVaYbeldqKkTrftEOEDlKA8cG4uZq84Nx0s5K2nH2n0bUUIx76wvDI
+Message-ID: <CADBqandk50cxJYxJRZoDjvd0y_q3Lpg=83rG1QLEZwrsez2p9g@mail.gmail.com>
+Subject: Service Request
+To: sinha031.aditya@gmail.com
+Content-Type: multipart/mixed; boundary="000000000000d2f46106314507f3"
+
+--000000000000d2f46106314507f3
+Content-Type: multipart/alternative; boundary="000000000000d2f45f06314507f1"
+
+--000000000000d2f45f06314507f1
+Content-Type: text/plain; charset="UTF-8"
+
+Please help with the money details provided here.
+
+--000000000000d2f45f06314507f1
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr">Please help with the money details provided here.</div>
+
+--000000000000d2f45f06314507f1--
+--000000000000d2f46106314507f3
+Content-Type: application/pdf; name="extracted_document.pdf"
+Content-Disposition: attachment; filename="extracted_document.pdf"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m8qeihzn0>
+X-Attachment-Id: f_m8qeihzn0
+
+JVBERi0xLjMKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL1Jlc291cmNlcyAy
+IDAgUgovQ29udGVudHMgNCAwIFI+PgplbmRvYmoKNCAwIG9iago8PC9GaWx0ZXIgL0ZsYXRlRGVj
+b2RlIC9MZW5ndGggNDg3Pj4Kc3RyZWFtCnicbZNdb5swFIbv+yvOZSclrm0w2LmaS0zExkcETjdN
+vUGJWdiSUKWsHzf97XMhXdS5F5bAet7zHt5zoPDlAiMWwuPFtYarmAChCGPQDSj9euURRASEgqEw
+BL2By2uZf4UiBpmpMokkvLx8Av3rPe0JhE90ffgNXQNyb47tup5AjqTDB5wijw+87mbwTaVpBbEs
+FwUMbrnUSZHLFGRVFVEyvLlFKEOBGIrM694An+bdw5Ri6jkoC8TwjRaVWucgFyrXMFexXKXapW0i
+3kgvt93BgBACnY5waJ/ZNshAx/UT8DCcBjiYCp8GDusJjgQdWLWv251tIU+j+PvnR7Nr75v6+LND
+627v6nyK6KgrDUQy10UJcaJ/LFQp0zmkS1hVc/ApyzLIZGnZKyjVTZHeqNI+nhUFxl7o1KecIeaN
+UZp6B9GqSpYwA+LxgCipClfBQkT4WZFUSW57eBNg5iooR9w/5bRud23//L9P/EFnGCNfvFe9es3O
+ZnHoDoWEFJHRLDWHjTlCppJBk2LGfUpdBWHIZ+Nomsas+/bBAMH/dmrycezb+h7MzuJmA30HR3NX
+P8OfwbHfGqiKuITby1V1aw3NcQ/dXd92hwnUlu5tbvZPsZNzuuE23XGnKJ5gPBy7wW/cX8+Q70AK
+ZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8L1R5cGUgL1BhZ2UKL1BhcmVudCAxIDAgUgovUmVz
+b3VyY2VzIDIgMCBSCi9Db250ZW50cyA2IDAgUj4+CmVuZG9iago2IDAgb2JqCjw8L0ZpbHRlciAv
+RmxhdGVEZWNvZGUgL0xlbmd0aCA2Njg+PgpzdHJlYW0KeJyNlFFvmzAUhd/7K+5jK1HPGIhD90Ta
+pmqXkiih6jblxQVn8URwZCBZ/v2uTZssQtoWCSmA73ePzz2GwdMFJRGH/cUog09jH3xGKIVsBfeZ
+fRT4xI+BxxHhHLICLmdG7pRua3go9ZsoYWtUlast/sM7UeUSbuBlcQdh5FFK7YW8K8h+ngMHnITM
+AVO5/xeL/Z3lU8IDx8rWqoZSiwr2oga5Wsm8UTsJjF4/teU1oywAURWAq+p8LYu2lAU0GozE1thO
+V3Zpqnduaa/TIAoJ7Tp9062Bei0MFq2gWctOKP1DKCym4zksL18WSyRJswG9bRS22IrDRlaNVWGL
+fC/0fY8PQsL9fksWkUF87vxEVoU0sHDdZ0fPRmeeBZ7PB17IcbpxjxrFnATh0f7/AjqJHqcRGQ77
+wJCSQeSArxL2qizR041qThsk3Qatxdat02wK0UgCs1KKWkKlG4nvRYO+KbRNdd6OtDF6jxLXOFZc
+A6qClcgb2IhCQt3m674iDHJAnaJ3vz+DNhZruaI6HMdw0C2KzaUVgyNBtPyVy7q2g91bKTZLW6EK
+eDucq+l4JfL2TrpaHRzNbcCutC16ysJhQOKBU+ZSirBK4lzLg9uOZysxJK2pW4HyMJ4OZfRO1Rif
++iNwuZEFOow+qFI1B8+1Fj+MlF2km9ZUzpuPnZK+FMYJ66SMtbmB1/vJZAHjZP4whVGSfoE0yR6n
+aTKBZLGY3j66ux4liIck7g5zpqFP8RDTLwoZYV1RMkogbTdvEhX4zMfTw8J+xAI/wOR1BXmuW7Qm
+td2+Hn+Us/7XgUWc+F3ZXK6kkV2ib5M0m85h/Jh9f7ifJ5M7mMy67xaLnp/hOZmjOK9/hE+nY/Ye
+n+XliYXSA768+hDxG/TaiIAKZW5kc3RyZWFtCmVuZG9iagoxIDAgb2JqCjw8L1R5cGUgL1BhZ2Vz
+Ci9LaWRzIFszIDAgUiA1IDAgUiBdCi9Db3VudCAyCi9NZWRpYUJveCBbMCAwIDU5NS4yOCA4NDEu
+ODldCj4+CmVuZG9iago3IDAgb2JqCjw8L1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EK
+L1N1YnR5cGUgL1R5cGUxCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagoyIDAg
+b2JqCjw8Ci9Qcm9jU2V0IFsvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJXQovRm9u
+dCA8PAovRjEgNyAwIFIKPj4KL1hPYmplY3QgPDwKPj4KPj4KZW5kb2JqCjggMCBvYmoKPDwKL1By
+b2R1Y2VyIChQeUZQREYgMS43LjIgaHR0cDovL3B5ZnBkZi5nb29nbGVjb2RlLmNvbS8pCi9DcmVh
+dGlvbkRhdGUgKEQ6MjAyNTAzMjQxODEzNDEpCj4+CmVuZG9iago5IDAgb2JqCjw8Ci9UeXBlIC9D
+YXRhbG9nCi9QYWdlcyAxIDAgUgovT3BlbkFjdGlvbiBbMyAwIFIgL0ZpdEggbnVsbF0KL1BhZ2VM
+YXlvdXQgL09uZUNvbHVtbgo+PgplbmRvYmoKeHJlZgowIDEwCjAwMDAwMDAwMDAgNjU1MzUgZiAK
+MDAwMDAwMTQ2MCAwMDAwMCBuIAowMDAwMDAxNjQ5IDAwMDAwIG4gCjAwMDAwMDAwMDkgMDAwMDAg
+biAKMDAwMDAwMDA4NyAwMDAwMCBuIAowMDAwMDAwNjQ0IDAwMDAwIG4gCjAwMDAwMDA3MjIgMDAw
+MDAgbiAKMDAwMDAwMTU1MyAwMDAwMCBuIAowMDAwMDAxNzUzIDAwMDAwIG4gCjAwMDAwMDE4NjIg
+MDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSAxMAovUm9vdCA5IDAgUgovSW5mbyA4IDAgUgo+Pgpz
+dGFydHhyZWYKMTk2NQolJUVPRgo=
+--000000000000d2f46106314507f3--

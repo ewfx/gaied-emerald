@@ -1,0 +1,126 @@
+Delivered-To: sinha031.aditya@gmail.com
+Received: by 2002:a17:906:cb88:b0:ac6:9a96:a171 with SMTP id mf8csp2269187ejb;
+        Wed, 26 Mar 2025 14:05:14 -0700 (PDT)
+X-Received: by 2002:a05:620a:d86:b0:7bc:de68:e932 with SMTP id af79cd13be357-7c5e49344admr700832485a.23.1743023114336;
+        Wed, 26 Mar 2025 14:05:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1743023114; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UGP01P0XdZKzbj72zgbZ6XstkVYFTnl4hkaKund/lqYDAk+wNymHbZk1JKStchfFVQ
+         KhUBXAYHkr6sji3B0EDI0MEyOjCBYaj6fFpl1HUw3xgu1H4veWBNCVRkU53vA/bY9UaN
+         OcIhETVnJuE2DEHY9wZq/Dgl8o9MUefFg3ZB/pRi/VwKfPy0Dq3j69QYmpF4JTtv9Jml
+         Q2CXOkQjs+oFibbYBwmsrk9pM27xHb1HSAwK36GacJMGwy7M/tcwapdRAg/JEaw31NVr
+         6daiABDbH8JZKUko1QwqJqjmxO+hyj6zBqzzRbdMTVbWXBwpxpcHmKTnu7a4GjJfNKxG
+         p/3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=88F9DePkF7XO5MEViSJt69lCbaiu75gjZrcMPkDaJSA=;
+        fh=vyYNUfc+RD2MOFKn10Q0ULZsjzRnAbg5wBT+fPAFkag=;
+        b=EDefVoS8uSbn+OOQflOsgw3T1so6V17xYBYrfbixp9eT9ZQxzknW0TNS3URojbeFwV
+         LlAqbBTKt3TH8hHfRG54hDVRc5/GQu7GKVxcbn7l2rwhmsgvAJfKWIdhUZd0VMguE0y7
+         m7b177gWUBA4rX4dDqsbhK66YRbkTdH4WMDxpsdcSLeRDj2T6uk89nksB8sGlNIrCA4W
+         XQD74/SueZeQ/OWiblIGqm8IxUjC0GmJrPBbGjQ3oeNk7hstvydHNdBpC7CY46HPUHhi
+         n8GIofYbak+pBtYko42c10FnC3Ja7uvLC9gwPDiUDqSvw4wANh6wfB8uWCZnDRMzD8qF
+         luMw==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=J7Cg+N9s;
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+Return-Path: <subramanianpriyanka89@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id af79cd13be357-7c5ece92018sor90507285a.1.2025.03.26.14.05.13
+        for <sinha031.aditya@gmail.com>
+        (Google Transport Security);
+        Wed, 26 Mar 2025 14:05:14 -0700 (PDT)
+Received-SPF: pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=J7Cg+N9s;
+       spf=pass (google.com: domain of subramanianpriyanka89@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=subramanianpriyanka89@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743023113; x=1743627913; dara=google.com;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=88F9DePkF7XO5MEViSJt69lCbaiu75gjZrcMPkDaJSA=;
+        b=J7Cg+N9s2QzYWS2zT/fRlaNWPco4tVFvwcvFAd1ZQzIZgFi3SSyaKKVNuLqPFIxThE
+         7J24E0+EnMkWRvJ5DuTttH4LDWj3WuvlrAiwBYzmtjOAw7+3ieXwZknZQNrRJIOdfo5I
+         IfWRpfROlJvjxj2d7+HgRla1sZRgtmsPrnyKKkTsm68uEv4Qj8ntOpxx1VA3+aiQW31i
+         yF2O0xxYutKnTKw1s9PA+BFG1lpsp/lbXPUQgl3/hfIRuP/wjc+cbnTnqTMiMfn192F1
+         J2XTcL/Jb6m/RJBXogylfmvZsqLsEflshU0N+n8oo59jZ+QLrRzBvq9tA0KJP8qou1OI
+         w6/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743023113; x=1743627913;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=88F9DePkF7XO5MEViSJt69lCbaiu75gjZrcMPkDaJSA=;
+        b=fl+McRmObhl8zn8DRWZgz7/U5paLQ2O6OKQwOD2H09xgLjKNzVeKw730W/edok8eR8
+         Cxy1mUYMeyilm3Nu3lScwGeHN5AKMeqQ9DHeuak4sPLWDrBjBQ0s34uKQvN/tvMOGtJd
+         UMrhfFFIbgf8oyEXFL3AD3GeIHeoF0YenhjIKQcxpDeMPJGe8pINV+8Ffx8/YGS1vHsQ
+         gUBt19Bib8RlZZm067l9EmlP9LnnWLLC5Pb5s747eGAXqBfUwosD8YcQdrQgqlHlJZdM
+         05gAlM7u+5S3Y5Mvn6QHlXbDbN0eGUEqNs3Vin0YDorgLQ53jTeIXcDNhbmMa7EptbV+
+         dvXA==
+X-Gm-Message-State: AOJu0YweQtkOh3iCr+LxaMi2/PS/cQi2xSKalDidESU/ZEYaWQlBNP20
+	acxTd1zXDOcYgao8T/YI1bHZyrlUbjyQERmSnYFSzd2wf+c16ShnijCzUpZ5qNnpBvwSlcGjkCo
+	qIIQVXSNPn59nq+RR26Xp/f3aOqsNuy3rwtY=
+X-Gm-Gg: ASbGncvS5VMqXkfre3wRnZTnv1fHnwEkCh0E+OSHJ8aqGNp0AMo1Es/jCjxq47j0GFE
+	DLhE7pbkTvm8lThcRqBWZOdZodUd35gDl/Q0V1Na07/pvlw6H7UfFpVPMXNvi6Llr2mGeJoZq2l
+	y6+l3WslWt+cfHeZBF+2DEW4U0Bhc=
+X-Google-Smtp-Source: AGHT+IFacW7H686utYsdy6hZm4yLEo7h38ZROLIPtDHQff39Mj9Yrgwm7igyyFjP7eJAKaTlQeAgUuyZvgJ/K+D9sdA=
+X-Received: by 2002:a05:6214:e6c:b0:6d9:ac3:e730 with SMTP id
+ 6a1803df08f44-6ed16c352a8mr96341976d6.5.1743023113288; Wed, 26 Mar 2025
+ 14:05:13 -0700 (PDT)
+MIME-Version: 1.0
+From: Priyanka Subramanian <subramanianpriyanka89@gmail.com>
+Date: Thu, 27 Mar 2025 02:35:02 +0530
+X-Gm-Features: AQ5f1JqC1Lv8jkEyBVVn6n6Mel0am8ezgwf3KcnVb-sX4KK6ecbPExwxT-hjUqA
+Message-ID: <CADBqane=qxcOWmjUsN5n6b-qYqq=V03LqP+rRekaK5GGgjYZHQ@mail.gmail.com>
+Subject: Reduction of EMI
+To: sinha031.aditya@gmail.com
+Content-Type: multipart/alternative; boundary="00000000000080c238063145310b"
+
+--00000000000080c238063145310b
+Content-Type: text/plain; charset="UTF-8"
+
+I hope this email finds you well. I am writing to formally request a
+reduction in my monthly loan payment for 123 due to temporary financial
+hardship, changes in business cash flow, etc.
+
+Our business has recently experienced [brief explanation of the reason,
+e.g., a slowdown in revenue, increased operational costs, etc., and we
+would like to explore options to lower our monthly payment to ensure
+continued timely payments.
+
+Could you please provide information on available options, such as loan
+modification, extended repayment terms, or any other restructuring
+programs? Additionally, let me know what documents or financial information
+may be required to process this request.
+
+I appreciate your time and assistance. Please let me know a convenient time
+to discuss this further.
+
+Best regards,
+
+Priyanka
+
+--00000000000080c238063145310b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><p style=3D"color:rgb(0,0,0)">I hope this email finds you =
+well. I am writing to formally request a reduction in my monthly loan payme=
+nt for 123 due to temporary financial hardship, changes in business cash fl=
+ow, etc.</p><p style=3D"color:rgb(0,0,0)">Our business has recently experie=
+nced [brief explanation of the reason, e.g., a slowdown in revenue, increas=
+ed operational costs, etc., and we would like to explore options to lower o=
+ur monthly payment to ensure continued timely payments.</p><p style=3D"colo=
+r:rgb(0,0,0)">Could you please provide information on available options, su=
+ch as loan modification, extended repayment terms, or any other restructuri=
+ng programs? Additionally, let me know what documents or financial informat=
+ion may be required to process this request.</p><p style=3D"color:rgb(0,0,0=
+)">I appreciate your time and assistance. Please let me know a convenient t=
+ime to discuss this further.</p><p style=3D"color:rgb(0,0,0)">Best regards,=
+</p><p style=3D"color:rgb(0,0,0)">Priyanka</p></div>
+
+--00000000000080c238063145310b--

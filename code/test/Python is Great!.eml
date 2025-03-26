@@ -1,0 +1,113 @@
+Delivered-To: sinha031.aditya@gmail.com
+Received: by 2002:a17:906:cb88:b0:ac6:9a96:a171 with SMTP id mf8csp2269853ejb;
+        Wed, 26 Mar 2025 14:07:25 -0700 (PDT)
+X-Received: by 2002:a05:6402:2712:b0:5e4:b874:3df7 with SMTP id 4fb4d7f45d1cf-5ed8eb08bf7mr961642a12.25.1743023244898;
+        Wed, 26 Mar 2025 14:07:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1743023244; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XHCd9IhndAZPZ7E0z7nBmwPw/NU/UCvxwJ1m0EdJHIV1TQ9clvXkOMe3uSviORhTU5
+         Ca/Ny3p/IGNr2bEfNKmoZ19cUVhQqVjS8GzuNJHu7X9swYJO6BNDSAlE14rMhLGdyxbV
+         osC9bClaWBuihhv4MkONDcTcebmzWnuF7zQtONJd6OUZ0eD4N9bB+0b7E3A8AeebtpUy
+         MCLfhSi682+cWFNU/dTRZ6VMgCRECgCcl1/g0fl81p5oAjU3BeIqFDiZc2BK6qQgvyCf
+         EfgOc+zc/zFk1GViVM5h9ayhdHO4sHH3BUDaSR8m4TvVTYzFTcx/0t9lpKf1nAO05RDr
+         ApLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=13G6p0dWfQgfc+9VFVIgRFPupjabZryr6x7+jwu6kZI=;
+        fh=vyYNUfc+RD2MOFKn10Q0ULZsjzRnAbg5wBT+fPAFkag=;
+        b=Ko+LGzb+1qXR3HXUwowJd53fQ94hc0WXe7HpeJa38Fm0TWjWMe5CG2hSBA1pgX0tf8
+         15mvKw8RdwAZf+vk++TipLihS++NUCUqgjZ2HbtssjfNCdTKFp4nsZZnkcJMisU7+xrB
+         wJDqvz2GLQAgc5CO9vChtU2L420V68EKlb6kOvWBaVT3eYmVXS4jeuFa10mHQviLEB1f
+         dhL3GGit/Bi6TK8nu2Yj2qWHhqerelA9ZeOdOJay34NWH0dbPFZeUTo3Xql3BSkEhwGU
+         yekQQNgmhIjqUjC5FXEWzRxauFEvTApgB3p0b/gqRENiJIQwq+T20OL4iAe5aInSPiDD
+         u4Fw==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=WuN5NqSO;
+       spf=pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=aditya.sinha031@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+Return-Path: <aditya.sinha031@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id 4fb4d7f45d1cf-5ed6c77cc2esor305725a12.2.2025.03.26.14.07.24
+        for <sinha031.aditya@gmail.com>
+        (Google Transport Security);
+        Wed, 26 Mar 2025 14:07:24 -0700 (PDT)
+Received-SPF: pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=WuN5NqSO;
+       spf=pass (google.com: domain of aditya.sinha031@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=aditya.sinha031@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743023244; x=1743628044; dara=google.com;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=13G6p0dWfQgfc+9VFVIgRFPupjabZryr6x7+jwu6kZI=;
+        b=WuN5NqSOY+/WahaXOcq61mR6l9NsLFUZ+sCdVOz6anfwa3y4f4JT2z5D1WDzNSRVnJ
+         XaD8mXPG9XA6TjdaIRt76KqC3elb1MiK0y8HU92S8IHyeJCZZL7CPq8EPoBGzi9Miesf
+         QJ9mK/FdBV6JJufgkh4wdKL7Eph93GyS7ri4lx5xE1sYD/ASszLTzerKSEa18pQG5dP6
+         FyUMDer9KOPsdLuFcWqeuPfZTFu/srtywtBJBd9EsajRXasfcllhbTAtHycFxrxFjfrc
+         VaaQAPSXMKN0oKn5OIM71kIoteTkzPRhnbNQlc/yHjj+CjLracRRinwDYBVW5+jRMJB6
+         bNMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743023244; x=1743628044;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=13G6p0dWfQgfc+9VFVIgRFPupjabZryr6x7+jwu6kZI=;
+        b=TAwQWMNN1RczqMCK+dnJeG8wmdsOqN4AXjIC3APCHGanYgasl5cT3nhrWO3H1JRFkw
+         CzyfuzqMloQXX7XuyjWCN3n4JixzffGyWzrawn+6heSQhgAgLLoR0v7YZvB+IbMDqa1f
+         IK69Wiz6+iBjvZK+dVaL4M1iuRKO9F0vctn6GKhHFCCJPRVK9+4foMh0zfTh6fXelZIy
+         aHchaXtSM/CO39FXrsHMoQoeFM3ini+OzPi7iIalu3kTT//Rj1e37f8so4cq8MTG/poN
+         hBpjWDVNM6XoWZst6azE7B3PzpCCBHSr36b//sqOdEvZCCDAJjaPRuUwJkCzEZfd+15L
+         Fguw==
+X-Gm-Message-State: AOJu0Yxj/BJ068bkEgd3I56xYQR+JGTNFrxkiEcij3RdMQDnnxhXAg3W
+	j/xIHueWJ4l6VP5LdHbp5f1B0soJxMrGXlS4fTHMBgocYOwZcXyRyFMgD+FbjRUPS4uwVis0sG7
+	yJCN6aFHkN35MeCzAPOtaeWAfEWi0Mg==
+X-Gm-Gg: ASbGncvMIEPjUF4w73wv6sBgpXAfQJNZQ7dQQpxPkz1p0wQj+2kBgXq5pUrjbzkp8wr
+	tlxdOfaPI0Ac4lN1K/ttQTYQJXusMG0JDwOt54SJRy3capEzVwLgtPKkwyXmxv1H0rmKp/7fMfW
+	hcmBlMwHRzXY5aObQ+3WfTTaLcAEeRBsl1Ef+NqqYoClVzh0YnF0hY9ckmP3+J
+X-Google-Smtp-Source: AGHT+IHQhm3YWO8gUSQfAkK5SN8XiNwWchr5KEriV8nbRI1XZbZgoi2Pb8uoJleX/KQyTo75icRnciEWC8gkd02gO5E=
+X-Received: by 2002:a05:6402:354d:b0:5eb:89f8:ca11 with SMTP id
+ 4fb4d7f45d1cf-5eda0eb01a4mr128337a12.5.1743023244163; Wed, 26 Mar 2025
+ 14:07:24 -0700 (PDT)
+MIME-Version: 1.0
+From: ADITYA SINHA <aditya.sinha031@gmail.com>
+Date: Thu, 27 Mar 2025 02:37:09 +0530
+X-Gm-Features: AQ5f1Jo1GzPvJmjX_jGi_1pAsOgpggB5aNRm7qIakyS5aLqMId1MElCFW7SFjoE
+Message-ID: <CAHwYq891WATvVZ1CTkqCvuX9gq4uzrvAcobUsgHQHQMAjJr+SA@mail.gmail.com>
+Subject: Python is Great!
+To: sinha031.aditya@gmail.com
+Content-Type: multipart/mixed; boundary="0000000000004dfd0606314539a0"
+
+--0000000000004dfd0606314539a0
+Content-Type: multipart/alternative; boundary="0000000000004dfd05063145399e"
+
+--0000000000004dfd05063145399e
+Content-Type: text/plain; charset="UTF-8"
+
+Working with Python is Amazing!!
+
+--0000000000004dfd05063145399e
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr">Working with Python is Amazing!!</div>
+
+--0000000000004dfd05063145399e--
+--0000000000004dfd0606314539a0
+Content-Type: text/plain; charset="US-ASCII"; name="Python.txt"
+Content-Disposition: attachment; filename="Python.txt"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m8qf0elh0>
+X-Attachment-Id: f_m8qf0elh0
+
+UHl0aG9uIGlzIHRoZSBiZXN0IHByb2dyYW1taW5nIGxhbmd1YWdl
+--0000000000004dfd0606314539a0
+Content-Type: text/plain; charset="US-ASCII"; name="HelloWorld.txt"
+Content-Disposition: attachment; filename="HelloWorld.txt"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m8qf0emn1>
+X-Attachment-Id: f_m8qf0emn1
+
+cHJpbnQoJ0hlbGxvIFdvcmxkJyk=
+--0000000000004dfd0606314539a0--
