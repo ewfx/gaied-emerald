@@ -14,7 +14,10 @@
 ---
 
 ## 🎯 Introduction
-A brief overview of your project and its purpose. Mention which problem statement are your attempting to solve. Keep it concise and engaging.
+## A brief overview of your project and its purpose. Mention which problem statement are your attempting to solve. Keep it concise and engaging.
+Our project aims to streamline the processing of commercial banking lending service requests by leveraging Gen AI-driven automation and using an AI agent to perform the task of gatekeeping which facilitates faster and smooth orchestration of service request mails to the appropriate team members based on the request and sub request type classified by the model. Our agentic workflow has been built using latest tools and models, where the workflow sits on n8n consuming Llama 3.2 90B Vision (Preview) model for activities such as summarization and classification and LlamaParse for OCR/ parsing of the documents.
+
+
 
 ## 🎥 Demo
 🔗 [Live Demo](#) (if applicable)  
@@ -25,36 +28,52 @@ A brief overview of your project and its purpose. Mention which problem statemen
 
 ## 💡 Inspiration
 What inspired you to create this project? Describe the problem you're solving.
+Email/ Document traige and routing is a common problem across teams, organizations, etc. and automating it benefits multiple teams. Also, this is our first agentic AI project levergaing Gen AI models, embaling us to step into the AI bubble.
 
 ## ⚙️ What It Does
 Explain the key features and functionalities of your project.
+1. Classifies the email based on context and provides the following as output in a json format:
+   a. Request type
+   b. Sub-request type
+   c. Confidence score
+   d. Reasoning
+   e. Numerical fields in the attachment
+2. It will identify if the response is general, redundant or irrelevant to the context, response to a previous request and mark them as duplicates
+3. It will identify if the mail contains more than one service request and return both request types as output
+4. It will prioritize context of email content over that of attachments.
 
 ## 🛠️ How We Built It
 Briefly outline the technologies, frameworks, and tools used in development.
+1. The workflow is built using n8n workflow automation tool where the trigger is a polling of gmail account every minute for the arrival of a new mail.
+2. The mail content and attachments ae then extracted and passed to LlamaParse.
+3. A webhook response waits for an asynchronous response from LlamaParse.
+4. The email content and LlamaParse output are summarized to ensure that they are not very lengthy.
+5. Finally the outputs are fed to the AI agent which uses Llama 3.2 90B Vision (Preview) model to accurately classify and provide output json with the details mentioned in the previous point.
 
 ## 🚧 Challenges We Faced
 Describe the major technical or non-technical challenges your team encountered.
+1. Understanding the capabilities and limitations of the n8n tool.
+2. We had to generate our own test data, we feel the testing could have been effective if some sample mails were provided.
+3. Understanding the business behind commercial loan offerings and the service requests that can be received.
 
+   
 ## 🏃 How to Run
 1. Clone the repository  
    ```sh
-   git clone https://github.com/your-repo.git
+   git clone https://github.com/ewfx/gaied-emerald
    ```
-2. Install dependencies  
-   ```sh
-   npm install  # or pip install -r requirements.txt (for Python)
-   ```
-3. Run the project  
-   ```sh
-   npm start  # or python app.py
-   ```
+2. Import the json files in a n8n workflow.
+  
+3. Setup gmail credential, bearer token for LlamaParse, Groq API keys for the AI model.
+
+4. Activate both the Mail_Extractor and Mail_Classifier workflows.
+
+5. Run the Mail_Extractor workflow (Mail_Classifier workflow is auto triggered).
 
 ## 🏗️ Tech Stack
-- 🔹 Frontend: React / Vue / Angular
-- 🔹 Backend: Node.js / FastAPI / Django
-- 🔹 Database: PostgreSQL / Firebase
-- 🔹 Other: OpenAI API / Twilio / Stripe
+n8n, LlamaParse
 
 ## 👥 Team
-- **Your Name** - [GitHub](#) | [LinkedIn](#)
-- **Teammate 2** - [GitHub](#) | [LinkedIn](#)
+- Priyanka Subramanian
+- Aditya Sinha
+- Marimuthu Ramasamy
