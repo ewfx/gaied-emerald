@@ -20,11 +20,9 @@ Our project aims to streamline the processing of commercial banking lending serv
 
 
 ## 🎥 Demo
-🔗 [Live Demo](#) (if applicable)  
-📹 [Video Demo](#) (if applicable)  
-🖼️ Screenshots:
+🔗 4 Videos uploaded
+📹 PPT describing the solution and scenarios uploaded
 
-![Screenshot 1](link-to-image)
 
 ## 💡 Inspiration
 What inspired you to create this project? Describe the problem you're solving.
@@ -38,7 +36,7 @@ Explain the key features and functionalities of your project.
    c. Confidence score
    d. Reasoning
    e. Numerical fields in the attachment
-2. It will identify if the response is general, redundant or irrelevant to the context, response to a previous request and mark them as duplicates
+2. It will identify if the response is generic, redundant or irrelevant to the context, response to a previous request and mark them as duplicates
 3. It will identify if the mail contains more than one service request and return both request types as output
 4. It will prioritize context of email content over that of attachments.
 
@@ -58,17 +56,15 @@ Describe the major technical or non-technical challenges your team encountered.
 
    
 ## 🏃 How to Run
-1. Clone the repository  
-   ```sh
-   git clone https://github.com/ewfx/gaied-emerald
-   ```
-2. Import the json files in a n8n workflow.
+1. Download the content in the repository.
+   
+2. Import the json files in the src folder in a n8n workflow.
   
 3. Setup gmail credential, bearer token for LlamaParse, Groq API keys for the AI model.
 
-4. Activate both the Mail_Extractor and Mail_Classifier workflows.
+4. Activate both the WF_Hackathon_EmailExtractor and WF_Hackathon_EmailClassifier workflows.
 
-5. Run the Mail_Extractor workflow (Mail_Classifier workflow is auto triggered).
+5. Run the WF_Hackathon_EmailExtractor workflow (WF_Hackathon_EmailClassifier workflow is auto triggered).
 
 ## 🏗️ Tech Stack
 n8n, LlamaParse
